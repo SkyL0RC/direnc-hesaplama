@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direnç Hesaplama</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        text-align: center;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        width: 300px;
+      }
+      .resistor {
+        margin-bottom: 20px;
+      }
+      .resistor-band {
+        width: 30px;
+        height: 60px;
+        display: inline-block;
+        margin: 0 5px;
+        border: 2px solid black;
+      }
+      .color-select {
+        margin: 10px;
+        padding: 5px;
+        width: 70%;
+        border: 1px solid #ccc;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        text-align: center;
+      }
+      .color-select:hover,
+      .color-select:focus {
+        border-color: #999;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin-top: 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      h2 {
+        margin-top: 20px;
+      }
+
+      .isim{
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Direnç Hesaplama</h1>
+
+      <!-- Direnç görseli -->
+      <div class="resistor">
+        <span
+          id="band1"
+          class="resistor-band"
+          style="background-color: black"
+        ></span>
+        <span
+          id="band2"
+          class="resistor-band"
+          style="background-color: black"
+        ></span>
+        <span
+          id="band3"
+          class="resistor-band"
+          style="background-color: black"
+        ></span>
+        <span
+          id="band4"
+          class="resistor-band"
+          style="background-color: transparent"
+        ></span>
+      </div>
+
+      <!-- Renk seçme kutuları -->
+      <label for="color1">Birinci Bant:</label>
+      <select id="color1" class="color-select" onchange="updateBandColor(1)">
+        <option value="black">Siyah (0)</option>
+        <option value="brown">Kahverengi (1)</option>
+        <option value="red">Kırmızı (2)</option>
+        <option value="orange">Turuncu (3)</option>
+        <option value="yellow">Sarı (4)</option>
+        <option value="green">Yeşil (5)</option>
+        <option value="blue">Mavi (6)</option>
+        <option value="purple">Mor (7)</option>
+        <option value="gray">Gri (8)</option>
+        <option value="white">Beyaz (9)</option></select
+      ><br />
+
+      <label for="color2">İkinci Bant:</label>
+      <select id="color2" class="color-select" onchange="updateBandColor(2)">
+        <option value="black">Siyah (0)</option>
+        <option value="brown">Kahverengi (1)</option>
+        <option value="red">Kırmızı (2)</option>
+        <option value="orange">Turuncu (3)</option>
+        <option value="yellow">Sarı (4)</option>
+        <option value="green">Yeşil (5)</option>
+        <option value="blue">Mavi (6)</option>
+        <option value="purple">Mor (7)</option>
+        <option value="gray">Gri (8)</option>
+        <option value="white">Beyaz (9)</option></select
+      ><br />
+
+      <label for="color3">Çarpan Bant:</label>
+      <select id="color3" class="color-select" onchange="updateBandColor(3)">
+        <option value="black">Siyah (x1)</option>
+        <option value="brown">Kahverengi (x10^1)</option>
+        <option value="red">Kırmızı (x10^2)</option>
+        <option value="orange">Turuncu (x10^3)</option>
+        <option value="yellow">Sarı (x10^4)</option>
+        <option value="green">Yeşil (x10^5)</option>
+        <option value="blue">Mavi (x10^6)</option>
+        <option value="purple">Mor (x10^7)</option>
+        <option value="gray">Gri (x10^8)</option>
+        <option value="white">Beyaz (x10^9)</option></select
+      ><br /><br />
+
+      <label for="tolerance">Tolerans Bant:</label>
+      <select id="tolerance" class="color-select" onchange="updateBandColor(4)">
+        <option value="none">Renksiz</option>
+        <option value="silver">Gümüş (±10%)</option>
+        <option value="gold">Altın (±5%)</option>
+        <option value="brown">Kahverengi (±1%)</option>
+        <option value="red">Kırmızı (±2%)</option>
+        <option value="green">Yeşil (±0.5%)</option>
+        <option value="blue">Mavi (±0.25%)</option>
+        <option value="purple">Mor (±0.1%)</option>
+        <option value="gray">Gri (±0.05%)</option>
+        </select
+      ><br /><br />
+
+      <button onclick="hesapla()">Direnç Hesapla</button>
+
+      <h2>Direnç Değeri: <span id="result"></span> kΩ</h2>
+      <h3>Tolerans Aralığı: <span id="tolerance-range"></span> kΩ</h3>
+
+      <h6 class="isim">created by skylorc</h6>
+    </div>
+
+    
+
+    <script>
+      const renkDegerleri = {
+        black: 0,
+        brown: 1,
+        red: 2,
+        orange: 3,
+        yellow: 4,
+        green: 5,
+        blue: 6,
+        purple: 7,
+        gray: 8,
+        white: 9,
+      };
+
+      const carpanDegerleri = {
+        black: 1,
+        brown: 10,
+        red: 100,
+        orange: 1000,
+        yellow: 10000,
+        green: 100000,
+        blue: 1000000,
+        purple: 10000000,
+        gray: 100000000,
+        white: 1000000000,
+      };
+
+      const toleransDegerleri = {
+        none: 20,
+        silver: 10,
+        gold: 5,
+        brown: 1,
+        red: 2,
+        green: 0.5,
+        blue: 0.25,
+        purple: 0.1,
+        gray: 0.05,
+      };
+
+      function updateBandColor(bandNumber) {
+        const color = document.getElementById(
+          bandNumber === 4 ? "tolerance" : `color${bandNumber}`
+        ).value;
+        document.getElementById(`band${bandNumber}`).style.backgroundColor =
+          color === "none" ? "transparent" : color;
+      }
+
+      function hesapla() {
+        let color1 = document.getElementById("color1").value;
+        let color2 = document.getElementById("color2").value;
+        let color3 = document.getElementById("color3").value;
+        let tolerance = document.getElementById("tolerance").value;
+
+        let dirençDeğeri =
+          (renkDegerleri[color1] * 10 + renkDegerleri[color2]) * 
+          carpanDegerleri[color3] / 1000; // kΩ için 1000'e böl;
+        let toleransDeğeri = toleransDegerleri[tolerance];
+        let altTolerans = dirençDeğeri - dirençDeğeri * (toleransDeğeri / 100);
+        let üstTolerans = dirençDeğeri + dirençDeğeri * (toleransDeğeri / 100);
+
+        document.getElementById("result").innerText = `${dirençDeğeri} `;
+        document.getElementById(
+          "tolerance-range"
+        ).innerText = `${altTolerans.toFixed(2)} Ω - ${üstTolerans.toFixed(
+          2
+        )} `;
+      }
+    </script>
+  </body>
+</html>
